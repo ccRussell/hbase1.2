@@ -1,6 +1,6 @@
 package com.russell.bigdata.hbase.util;
 
-import com.russell.bigdata.hbase.common.RowKeyDo;
+import com.russell.bigdata.hbase.common.RowKeyDO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
@@ -43,7 +43,7 @@ public class HbaseClient {
         TableName table = TableName.valueOf(tableName);
 
         if (admin.tableExists(table)) {
-            System.out.println("talbe is exists!");
+            System.out.println("table is exists!");
         } else {
             HTableDescriptor hTableDescriptor = new HTableDescriptor(table);
             for (String col : cols) {
@@ -52,6 +52,20 @@ public class HbaseClient {
             }
             admin.createTable(hTableDescriptor);
         }
+    }
+
+    /**
+     * 列出所有的表
+     *
+     * @throws IOException
+     */
+    public List<String> listTables() throws IOException {
+        HTableDescriptor[] hTableDescriptor = admin.listTables();
+        List<String> tables = new ArrayList<>();
+        for (HTableDescriptor tableDescriptor : hTableDescriptor) {
+            tables.add(tableDescriptor.getTableName().getNameAsString());
+        }
+        return tables;
     }
 
     /**
@@ -72,12 +86,12 @@ public class HbaseClient {
      * 批量插入
      *
      * @param tableName    表名
-     * @param rowKeyDoList 插入的内容
+     * @param rowKeyDOList 插入的内容
      */
-    public void putData(String tableName, List<RowKeyDo> rowKeyDoList) throws IOException {
+    public void putData(String tableName, List<RowKeyDO> rowKeyDOList) throws IOException {
         Table table = connection.getTable(TableName.valueOf(tableName));
         List<Put> puts = new ArrayList<>();
-        for (RowKeyDo rowKeyDo : rowKeyDoList) {
+        for (RowKeyDO rowKeyDo : rowKeyDOList) {
             Put put = new Put(Bytes.toBytes(rowKeyDo.getRowKey()));
             put.addColumn(Bytes.toBytes(rowKeyDo.getColFamily()), Bytes.toBytes(rowKeyDo.getQualifier()),
                     Bytes.toBytes(rowKeyDo.getValue()));
@@ -94,7 +108,7 @@ public class HbaseClient {
      * @return
      * @throws IOException
      */
-    public Result getData(String tableName, RowKeyDo rowKeyDo) throws IOException {
+    public Result getData(String tableName, RowKeyDO rowKeyDo) throws IOException {
         Table table = connection.getTable(TableName.valueOf(tableName));
         Get get = new Get(Bytes.toBytes(rowKeyDo.getRowKey()));
         String colFamily = rowKeyDo.getColFamily();
@@ -111,11 +125,11 @@ public class HbaseClient {
     }
 
     /**
-     * 批量查询数据
+     * 批量查询数据（前闭后开）
      *
      * @param tableName
-     * @param startRow
-     * @param stopRow
+     * @param startRow 起始rowKey
+     * @param stopRow  结束rowkey
      */
     public ResultScanner scanData(String tableName, String startRow, String stopRow) throws IOException {
         Table table = connection.getTable(TableName.valueOf(tableName));

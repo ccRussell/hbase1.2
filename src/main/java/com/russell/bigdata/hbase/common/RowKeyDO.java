@@ -7,7 +7,7 @@ import lombok.Data;
  * @Date 2019/3/5
  */
 @Data
-public class RowKeyDo {
+public class RowKeyDO {
 
     /**
      * 插入内容的rowKey
