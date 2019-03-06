@@ -18,35 +18,35 @@ import java.util.List;
 @Slf4j
 public class TestMain {
 
-    private static String tableName = "hbase:user";
+    private static String tableName = "hbase_user";
     private static String[] colFamily = {"userInfo"};
 
     public static void main(String[] args) throws Exception {
         HbaseClient hbaseClient = HbaseClient.getInstance();
         // 测试创建表
-        System.out.println("创建表开始......");
+        log.info("创建表开始......");
         hbaseClient.createTable(tableName, colFamily);
         List<String> tables = hbaseClient.listTables();
 
-        System.out.println("=======================================");
-        System.out.println("插入单rowkey，多列的数据");
+        log.info("=======================================");
+        log.info("插入单rowkey，多列的数据");
         hbaseClient.putData(tableName, generateSingleRows());
         RowKeyDO query = new RowKeyDO();
         query.setRowKey("hbase_rowkey_0");
         Result result = hbaseClient.getData(tableName, query);
         hbaseClient.showCell(result);
 
-        System.out.println("=======================================");
-        System.out.println("插入多rowkey，多列的数据");
+        log.info("=======================================");
+        log.info("插入多rowkey，多列的数据");
         hbaseClient.putData(tableName, generateMuilteRows());
-        System.out.println("批量查询数据......");
+        log.info("批量查询数据......");
         String startRow = "hbase_rowkey_0";
         String stopRow = "hbase_rowkey_3";
         ResultScanner scanner = hbaseClient.scanData(tableName, startRow, stopRow);
         for (Result result1 : scanner) {
             hbaseClient.showCell(result1);
         }
-        System.out.println("测试完成......");
+        log.info("测试完成......");
 
     }
 
