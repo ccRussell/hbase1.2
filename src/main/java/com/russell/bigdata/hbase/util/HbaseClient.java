@@ -157,6 +157,11 @@ public class HbaseClient {
     }
 
 
+    /**
+     * 使用单例模式获取client实例
+     *
+     * @return
+     */
     public static HbaseClient getInstance() {
         if (instance == null) {
             synchronized (HbaseClient.class) {
